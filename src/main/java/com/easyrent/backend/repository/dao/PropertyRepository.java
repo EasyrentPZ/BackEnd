@@ -1,4 +1,4 @@
 package com.easyrent.backend.repository.dao;
 
-public class PropertyRepository {
+public interface PropertyRepository {
 }
