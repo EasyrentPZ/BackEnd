@@ -1,36 +1,61 @@
 package com.easyrent.backend.repository.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
 @Data
-public class User {
+@Entity
+@Table(name = "\"user\"")
+public class User
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    Integer userId;
-    @Column(name = "email")
+    @Column(name = "user_id", nullable = false)
+    private Integer id;
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
-    @Column(name = "password")
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
-    @Column(name = "name")
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
-    @Column(name = "lastname")
-    private String surname;
-    @Column(name = "phone_number")
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "lastname", nullable = false, length = 100)
+    private String lastname;
+
+    @Size(max = 100)
+    @Column(name = "phone_number", length = 100)
     private String phoneNumber;
-    @Column(name = "bank_account")
+
+    @Size(max = 100)
+    @Column(name = "bank_account", length = 100)
     private String bankAccount;
-    @ManyToMany
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Property> properties = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "notifier")
+    private Set<Ticket> tickets = new LinkedHashSet<>();
+
+    @ManyToMany(mappedBy = "users")
+    private Set<Contract> contracts = new LinkedHashSet<>();
+
+    @ManyToMany(mappedBy = "users")
+    private Set<Role> roles = new LinkedHashSet<>();
 
 }

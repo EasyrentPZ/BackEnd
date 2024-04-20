@@ -1,6 +1,8 @@
 package com.easyrent.backend.repository.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Set;
@@ -11,11 +13,12 @@ import java.util.Set;
 public class TicketStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer statusId;
+    @Column(name = "ticket_status_id", nullable = false)
+    private Integer id;
 
-    @Column(name = "name")
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @OneToMany(mappedBy = "status")
-    private Set<Ticket> tickets;
 }
