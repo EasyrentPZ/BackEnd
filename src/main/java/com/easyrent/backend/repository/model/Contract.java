@@ -1,10 +1,13 @@
 package com.easyrent.backend.repository.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -12,24 +15,38 @@ import java.util.List;
 public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer contractId;
+    @Column(name = "contract_id", nullable = false)
+    private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id")
+    @NotNull
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @Column(name = "rent_money")
-    private Double rentMoney;
-
-    @Column(name = "start_date")
-    private Date startDate;
+    @NotNull
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
-    @Column(name = "notes")
+    @Size(max = 512)
+    @Column(name = "notes", length = 512)
     private String notes;
 
+    @OneToMany(mappedBy = "contract")
+    private Set<Announcement> announcements = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "contract")
+    private Set<Payment> payments = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "contract")
+    private Set<Ticket> tickets = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_contract",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "contract_id"))
+    private Set<User> users = new LinkedHashSet<>();
 
 }

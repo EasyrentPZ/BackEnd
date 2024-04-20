@@ -1,44 +1,84 @@
 package com.easyrent.backend.repository.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.util.HashSet;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Data
+@Getter
+@Setter
 @Entity
 @Table(name = "property")
-public class Property {
+public class Property
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer propertyId;
+    @Column(name = "property_id", nullable = false)
+    private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id")
-    private PropertyStatus status;
-
-    @Column(name = "address")
+    @Size(max = 100)
+    @Column(name = "address", length = 100)
     private String address;
 
     @Column(name = "area")
     private Double area;
 
-    @Column(name = "description")
+    @Size(max = 200)
+    @Column(name = "description", length = 200)
     private String description;
 
-    @Column(name = "features")
-    private String features;
+    @Column(name = "pets")
+    private Boolean pets;
+
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "property_features",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id")
+    )
+    private Set<Features> features = new LinkedHashSet<>();
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "city_id", nullable = false)
+    private City city;
+
+    @NotNull
+    @Column(name = "rent_amount", nullable = false)
+    private BigDecimal rentAmount;
+
+    @NotNull
+    @Column(name = "utility_cost", nullable = false)
+    private BigDecimal utilityCost;
+
+    @NotNull
+    @Column(name = "deposit", nullable = false)
+    private BigDecimal deposit;
+
+    @Size(max = 100)
+    @Column(name = "street_name", length = 100)
+    private String streetName;
+
+    @OneToOne(mappedBy = "property")
+    private Contract contract;
 
     @OneToMany(mappedBy = "property")
-    private List<Announcement> announcements;
+    private Set<PropertyPhoto> propertyPhotos = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "feature")
-    private Set<PropertyFeatures> employerDeliveryAgent = new HashSet<PropertyFeatures>();
 
 }

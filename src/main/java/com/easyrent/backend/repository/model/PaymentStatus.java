@@ -1,18 +1,17 @@
 package com.easyrent.backend.repository.model;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
 @Entity
-@Table(name = "property_status")
-public class PropertyStatus {
+@Table(name = "payment_status")
+public class PaymentStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "property_status_id", nullable = false)
+    @Column(name = "payment_status_id", nullable = false)
     private Integer id;
 
     @Size(max = 100)

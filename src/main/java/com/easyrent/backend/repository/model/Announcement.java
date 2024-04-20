@@ -1,28 +1,40 @@
 package com.easyrent.backend.repository.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "announcement")
 public class Announcement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer announcementId;
+    @Column(name = "announcement_id", nullable = false)
+    private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id")
-    private Contract property;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "contract_id", nullable = false)
+    private Contract contract;
 
-    @Column(name = "title")
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @Column(name = "description")
+    @Size(max = 200)
+    @NotNull
+    @Column(name = "description", nullable = false, length = 200)
     private String description;
 
-    @Column(name = "issue_date")
-    private Date issueDate;
+    @NotNull
+    @Column(name = "issue_date", nullable = false)
+    private LocalDate issueDate;
+
 }
