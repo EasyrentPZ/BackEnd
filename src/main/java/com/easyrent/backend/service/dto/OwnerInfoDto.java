@@ -7,7 +7,7 @@ public class OwnerInfoDto
 {
     private Integer id;
     private String name;
-    private String lastName;
+    private String lastname;
     private String email;
     private String phoneNumber;
 }
