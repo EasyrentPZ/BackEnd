@@ -3,9 +3,8 @@ package com.easyrent.backend.service.dto;
 import lombok.Data;
 
 @Data
-public class CityInfoDto
+public class CountryInfoDto
 {
     private Integer id;
-    private AdministrativeRegionInfoDto region;
-    private String name;
+    private String countryName;
 }

@@ -16,9 +16,9 @@ public class PropertyController
     private final PropertyService propertyService;
 
     @GetMapping
-    public ResponseEntity<Page<PropertyResponseDto>> getAllProperties()
+    public ResponseEntity<Page<PropertyResponseDto>> getAllMarketProperties()
     {
-        Page<PropertyResponseDto> propertiesPage = propertyService.getAllProperties();
+        Page<PropertyResponseDto> propertiesPage = propertyService.getAllMarketProperties();
         return ResponseEntity.ok().body(propertiesPage);
     }
 

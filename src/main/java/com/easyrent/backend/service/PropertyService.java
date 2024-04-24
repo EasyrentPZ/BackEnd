@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 public class PropertyService
 {
     private final PropertyRepository propertyRepository;
-    public Page<PropertyResponseDto> getAllProperties()
+    public Page<PropertyResponseDto> getAllMarketProperties()
     {
-        List<Property> properties = propertyRepository.findAll();
+        List<Property> properties = propertyRepository.findByPropertyStatusId(2);
         List<PropertyResponseDto> dto = properties.stream()
                 .map(PropertyMapper::marketMapPropertyToDto)
                 .collect(Collectors.toList());

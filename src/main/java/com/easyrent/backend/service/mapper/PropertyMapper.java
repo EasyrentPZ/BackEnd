@@ -3,6 +3,7 @@ package com.easyrent.backend.service.mapper;
 import com.easyrent.backend.repository.model.*;
 import com.easyrent.backend.service.dto.*;
 import com.easyrent.backend.service.dto.OwnerInfoDto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.BeanUtils;
 
 import java.util.stream.Collectors;
@@ -47,9 +48,11 @@ public class PropertyMapper
         CityInfoDto cityDto = new CityInfoDto();
         AdministrativeRegionInfoDto regionDto = new AdministrativeRegionInfoDto();
         AdministrativeRegion reg = city.getAdministrativeRegion();
+
         regionDto.setId(reg.getId());
         regionDto.setRegionName(reg.getRegionName());
-        regionDto.setCountry_name(reg.getCountry().getCountryName());
+
+        regionDto.setCountryInfoDto(mapCountryToDto(reg.getCountry()));
 
         cityDto.setId(city.getId());
         cityDto.setName(city.getCityName());
@@ -63,5 +66,12 @@ public class PropertyMapper
         PhotoInfoDto photoDTO = new PhotoInfoDto();
         BeanUtils.copyProperties(photo, photoDTO);
         return photoDTO;
+    }
+
+    private static CountryInfoDto mapCountryToDto(Country country)
+    {
+        CountryInfoDto countryDto = new CountryInfoDto();
+        BeanUtils.copyProperties(country, countryDto);
+        return countryDto;
     }
 }

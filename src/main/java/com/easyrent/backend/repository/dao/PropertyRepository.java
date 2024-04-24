@@ -13,4 +13,5 @@ import java.util.Set;
 public interface PropertyRepository extends JpaRepository<Property, Long>
 {
     List<Property> findByOwnerId(Integer ownerId);
+    List<Property> findByPropertyStatusId(Integer propertyStatusId);
 }
