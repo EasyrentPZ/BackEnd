@@ -22,4 +22,5 @@ public class PropertyResponseDto
     private BigDecimal deposit;
     private String streetName;
     private Set<PhotoInfoDto> photos;
+    private Integer livingRooms;
 }

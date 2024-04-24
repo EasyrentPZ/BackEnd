@@ -2,25 +2,28 @@ package com.easyrent.backend.repository.model;
 
 import com.easyrent.backend.repository.enums.FeaturesList;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "properties")
+@ToString(exclude = "properties")
 @Entity
 @Table(name = "features")
-public class Features {
+public class Features
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer featureId;
+    @Column(name = "feature_id", nullable = false)
+    private Integer id;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    private FeaturesList name;
+    private String name;
 
     @ManyToMany(mappedBy = "features")
     private Set<Property> properties = new LinkedHashSet<>();
-
 
 }

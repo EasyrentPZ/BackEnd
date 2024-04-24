@@ -8,7 +8,8 @@ import lombok.Setter;
 @Data
 @Entity
 @Table(name = "user_contract")
-public class UserContract {
+public class UserContract
+{
     @EmbeddedId
     private UserContractId id;
 

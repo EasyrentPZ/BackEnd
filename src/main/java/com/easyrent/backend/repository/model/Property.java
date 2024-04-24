@@ -45,7 +45,8 @@ public class Property
     @Column(name = "pets")
     private Boolean pets;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER)
     @JoinTable(
             name = "property_features",
             joinColumns = @JoinColumn(name = "property_id"),
@@ -66,6 +67,9 @@ public class Property
     @Column(name = "utility_cost", nullable = false)
     private BigDecimal utilityCost;
 
+    @Column(name = "living_rooms", nullable = false)
+    private Integer livingRooms;
+
     @NotNull
     @Column(name = "deposit", nullable = false)
     private BigDecimal deposit;
@@ -74,11 +78,16 @@ public class Property
     @Column(name = "street_name", length = 100)
     private String streetName;
 
-    @OneToOne(mappedBy = "property")
+    @OneToOne(mappedBy = "property",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Contract contract;
 
-    @OneToMany(mappedBy = "property")
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Set<PropertyPhoto> propertyPhotos = new LinkedHashSet<>();
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_status_id")
+    private PropertyStatus propertyStatus;
 }

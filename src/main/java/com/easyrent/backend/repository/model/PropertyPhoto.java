@@ -3,12 +3,15 @@ package com.easyrent.backend.repository.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "property_photo")
-public class PropertyPhoto {
+@ToString(exclude = "property")
+public class PropertyPhoto
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "photo_id", nullable = false)
@@ -26,6 +29,6 @@ public class PropertyPhoto {
     @Size(max = 256)
     @NotNull
     @Column(name = "photo", nullable = false, length = 256)
-    private String photo;
+    private String link;
 
 }
