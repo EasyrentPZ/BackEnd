@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class PhotoInfoDto
 {
-    private String photo;
+    private Integer id;
+    private String link;
     private Boolean isMain;
 }
