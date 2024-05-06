@@ -72,7 +72,18 @@ public class AuthenticationService
                 .token(token)
                 .build();
     }
-
+    public boolean changePassword(Integer id, PasswordChangeDto passwordDto) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null && passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword())) {
+            if(!isValidPassword(passwordDto.getNewPassword())) {
+                throw new IllegalArgumentException("Password does not meet the requirements!");
+            }
+            user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
     // Validate email format
     private boolean isValidEmail(String email)
     {
