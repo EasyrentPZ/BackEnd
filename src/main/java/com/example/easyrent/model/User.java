@@ -52,7 +52,10 @@ public class User implements UserDetails
     @ManyToMany(mappedBy = "users")
     private Set<Contract> contracts = new LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new LinkedHashSet<>();
 
     @Override
