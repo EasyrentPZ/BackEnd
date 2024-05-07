@@ -22,7 +22,7 @@ public class PropertyController
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<Page<PropertyResponseDto>> getPropertiesByOwnerId(@PathVariable("ownerId") int ownerId)
+    public ResponseEntity<Page<PropertyResponseDto>> getPropertiesByOwnerId(@CookieValue("jwtCookie") String jwtToken, @PathVariable("ownerId") int ownerId)
     {
         System.out.println(ownerId);
         Page<PropertyResponseDto> propertiesPage = propertyService.getPropertiesByOwnerId(ownerId);

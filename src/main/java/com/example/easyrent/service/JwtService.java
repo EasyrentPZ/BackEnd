@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class JwtService
     @Value("${token.signing.key}")
     private String jwtSigningKey;
     private Jwts jwtsParser;
-    public String extractUsername(String token)
+    public String extractEmail(String token)
     {
         return extractClaim(token, Claims::getSubject);
     }
@@ -33,7 +34,7 @@ public class JwtService
 
     public boolean isTokenValid(String token, UserDetails userDetails)
     {
-        final String userName = extractUsername(token);
+        final String userName = extractEmail(token);
         return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
@@ -77,5 +78,11 @@ public class JwtService
     {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public boolean checkAuthenticationStatus()
+    {
+        return SecurityContextHolder.getContext().getAuthentication() != null
+                && SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
     }
 }

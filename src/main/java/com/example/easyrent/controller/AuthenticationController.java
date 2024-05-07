@@ -5,6 +5,8 @@ import com.example.easyrent.dto.request.SignUpRequest;
 import com.example.easyrent.dto.response.JwtAuthenticationResponse;
 import com.example.easyrent.service.AuthenticationService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,8 +49,14 @@ public class AuthenticationController
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<JwtAuthenticationResponse> signin(@RequestBody SignInRequest request)
+    public ResponseEntity<String> signin(@RequestBody SignInRequest request, HttpServletResponse res)
     {
-        return ResponseEntity.ok(authenticationService.signIn(request));
+        JwtAuthenticationResponse token = authenticationService.signIn(request);
+        Cookie jwtCookie = new Cookie("jwtCookie", token.getToken());
+        jwtCookie.setPath("/");
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setMaxAge(36000);
+        res.addCookie(jwtCookie);
+        return ResponseEntity.ok("Success");
     }
 }
