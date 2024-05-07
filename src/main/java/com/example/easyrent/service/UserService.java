@@ -51,17 +51,24 @@ public class UserService implements UserDetailsService
         return optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
-    public User findById(Integer id) {
+    public User findById(Integer id)
+    {
         return userRepository.findById(id).orElse(null);
     }
 
-    public boolean updateUser(Integer id, UserUpdateDto userDto) {
+    public boolean updateUser(Integer id, UserUpdateDto userDto)
+    {
         User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
-            user.setName(userDto.getName());
-            user.setLastname(userDto.getLastname());
-            user.setPhoneNumber(userDto.getPhoneNumber());
-            user.setUsername(userDto.getEmail());
+        if (user != null)
+        {
+            if (userDto.getName() != null)
+                user.setName(userDto.getName());
+            if (userDto.getLastname() != null)
+                user.setLastname(userDto.getLastname());
+            if (userDto.getPhoneNumber() != null)
+                user.setPhoneNumber(userDto.getPhoneNumber());
+            if (userDto.getEmail() != null)
+                user.setUsername(userDto.getEmail());
             userRepository.save(user);
             return true;
         }
