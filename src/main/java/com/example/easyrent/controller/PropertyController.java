@@ -15,14 +15,14 @@ public class PropertyController
     private final PropertyService propertyService;
 
     @GetMapping
-    public ResponseEntity<Page<PropertyResponseDto>> getAllMarketProperties()
+    public ResponseEntity<Page<PropertyResponseDto>> getAllMarketProperties(@CookieValue("jwtCookie") String jwtToken)
     {
         Page<PropertyResponseDto> propertiesPage = propertyService.getAllMarketProperties();
         return ResponseEntity.ok().body(propertiesPage);
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<Page<PropertyResponseDto>> getPropertiesByOwnerId(@PathVariable("ownerId") int ownerId)
+    public ResponseEntity<Page<PropertyResponseDto>> getPropertiesByOwnerId(@CookieValue("jwtCookie") String jwtToken, @PathVariable("ownerId") int ownerId)
     {
         System.out.println(ownerId);
         Page<PropertyResponseDto> propertiesPage = propertyService.getPropertiesByOwnerId(ownerId);
@@ -30,7 +30,7 @@ public class PropertyController
     }
 
     @GetMapping("/owner/properties/{propertyId}")
-    public ResponseEntity<PropertyResponseDto> getOwnerPropertyById(@PathVariable("propertyId") Integer propertyId)
+    public ResponseEntity<PropertyResponseDto> getOwnerPropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
     {
         PropertyResponseDto propertyDto = propertyService.getOwnerPropertyById(propertyId);
         if (propertyDto != null)
@@ -40,7 +40,7 @@ public class PropertyController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePropertyById(@PathVariable("id") Integer id)
+    public ResponseEntity<String> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id)
     {
         boolean deleted = propertyService.deletePropertyById(id);
         if (deleted)

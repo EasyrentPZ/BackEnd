@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService
 
     public User getUserFromToken(String token)
     {
-        String email = jwtService.extractUsername(token);
+        String email = jwtService.extractEmail(token);
         Optional<User> optionalUser = userRepository.findByUsername(email);
         return optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
