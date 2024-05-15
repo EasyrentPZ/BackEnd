@@ -2,6 +2,7 @@ package com.example.easyrent.service;
 
 import com.example.easyrent.mapper.PropertyMapper;
 import com.example.easyrent.model.Property;
+import com.example.easyrent.model.User;
 import com.example.easyrent.repository.PropertyRepository;
 import com.example.easyrent.dto.response.*;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class PropertyService
 {
     private final PropertyRepository propertyRepository;
+    private final UserService userService;
     public Page<PropertyResponseDto> getAllMarketProperties()
     {
         List<Property> properties = propertyRepository.findByPropertyStatusId(2);
@@ -26,27 +28,37 @@ public class PropertyService
         return new PageImpl<>(dto);
     }
 
-    public Page<PropertyResponseDto> getPropertiesByOwnerId(Integer ownerId)
+    public Page<PropertyResponseDto> getOwnerProperties(String jwtToken)
     {
-        List<Property> properties = propertyRepository.findByOwnerId(ownerId);
+        User currentUser = userService.getUserFromToken(jwtToken);
+        List<Property> properties = propertyRepository.findByOwnerId(currentUser.getId());
         List<PropertyResponseDto> dto = properties.stream()
                 .map(PropertyMapper::marketMapPropertyToDto)
                 .collect(Collectors.toList());
         return new PageImpl<>(dto);
     }
 
-    public PropertyResponseDto getOwnerPropertyById(Integer id)
+    public PropertyResponseDto getOwnerProperty(String jwtToken, Integer propertyId)
     {
-        Property property = propertyRepository.findById(id).orElse(null);
-        return property != null ? PropertyMapper.marketMapPropertyToDto(property) : null;
+        User currentUser = userService.getUserFromToken(jwtToken);
+        Property property = propertyRepository.findById(propertyId).orElse(null);
+        if(property != null && currentUser.getProperties().contains(property))
+            return PropertyMapper.marketMapPropertyToDto(property);
+        return null;
     }
 
-    public boolean deletePropertyById(Integer id)
+    public boolean deletePropertyById(String jwtToken, Integer id)
     {
         try
         {
-            propertyRepository.deleteById(id);
-            return true;
+            User currentUser = userService.getUserFromToken(jwtToken);
+            Property property = propertyRepository.findById(id).orElse(null);
+            if(property != null && currentUser.getProperties().contains(property))
+            {
+                propertyRepository.deleteById(id);
+                return true;
+            }
+            return false;
         }
         catch (Exception e)
         {

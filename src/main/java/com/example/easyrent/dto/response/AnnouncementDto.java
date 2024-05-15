@@ -4,7 +4,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 @Data
-public class AnnouncementDto {
+public class AnnouncementDto
+{
     private Integer id;
     private String title;
     private String description;
