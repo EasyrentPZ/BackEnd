@@ -21,18 +21,17 @@ public class PropertyController
         return ResponseEntity.ok().body(propertiesPage);
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<Page<PropertyResponseDto>> getPropertiesByOwnerId(@CookieValue("jwtCookie") String jwtToken, @PathVariable("ownerId") int ownerId)
+    @GetMapping("/owner")
+    public ResponseEntity<Page<PropertyResponseDto>> getOwnerProperties(@CookieValue("jwtCookie") String jwtToken)
     {
-        System.out.println(ownerId);
-        Page<PropertyResponseDto> propertiesPage = propertyService.getPropertiesByOwnerId(ownerId);
+        Page<PropertyResponseDto> propertiesPage = propertyService.getOwnerProperties(jwtToken);
         return ResponseEntity.ok().body(propertiesPage);
     }
 
     @GetMapping("/owner/properties/{propertyId}")
-    public ResponseEntity<PropertyResponseDto> getOwnerPropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
+    public ResponseEntity<PropertyResponseDto> getOwnerProperty(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
     {
-        PropertyResponseDto propertyDto = propertyService.getOwnerPropertyById(propertyId);
+        PropertyResponseDto propertyDto = propertyService.getOwnerProperty(jwtToken, propertyId);
         if (propertyDto != null)
             return ResponseEntity.ok().body(propertyDto);
         else
@@ -42,7 +41,7 @@ public class PropertyController
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id)
     {
-        boolean deleted = propertyService.deletePropertyById(id);
+        boolean deleted = propertyService.deletePropertyById(jwtToken, id);
         if (deleted)
             return ResponseEntity.ok().body("Property " + "deleted successfully.");
         else
