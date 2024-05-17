@@ -2,16 +2,21 @@ package com.example.easyrent.mapper;
 
 import com.example.easyrent.dto.request.AnnouncementRequest;
 import com.example.easyrent.dto.response.AnnouncementDto;
+import com.example.easyrent.dto.response.TicketViewResponseDto;
 import com.example.easyrent.model.Announcement;
 import com.example.easyrent.model.Contract;
+import com.example.easyrent.model.Ticket;
+import com.example.easyrent.model.User;
 import com.example.easyrent.repository.ContractRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 @AllArgsConstructor
 @Component
-public class AnnouncementMapper {
+public class AnnouncementMapper
+{
     private final ContractRepository contractRepository;
 
     public AnnouncementDto toDto(Announcement announcement) {

@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "ticket")
-public class Ticket {
+public class Ticket
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ticket_id", nullable = false)
@@ -28,5 +32,11 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ticket_status_id", nullable = false)
     private TicketStatus ticketStatus;
+
+    @Column(name = "date", nullable = false)
+    private Date date;
+
+    @Column(name = "description", length = 250)
+    private String description;
 
 }

@@ -64,7 +64,7 @@ public class Property
     @ManyToMany(mappedBy = "properties")
     private Set<Feature> features = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "property")
+    @OneToMany(mappedBy = "property", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<PropertyPhoto> propertyPhotos = new LinkedHashSet<>();
 
 }
