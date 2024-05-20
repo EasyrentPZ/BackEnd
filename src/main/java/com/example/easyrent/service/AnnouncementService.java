@@ -43,24 +43,44 @@ public class AnnouncementService
         return announcementRepository.save(announcement);
     }
 
-    public Optional<Announcement> update(Integer id, Announcement announcementDetails) {
-        return announcementRepository.findById(id)
-                .map(existingAnnouncement -> {
-                    // Assuming all fields in announcementDetails are set, otherwise check for null
-                    existingAnnouncement.setTitle(announcementDetails.getTitle());
-                    existingAnnouncement.setDescription(announcementDetails.getDescription());
-                    existingAnnouncement.setIssueDate(announcementDetails.getIssueDate());
-                    // Save and return the updated announcement
-                    return announcementRepository.save(existingAnnouncement);
-                });
+
+    public boolean updateAnnouncement(String jwtToken, Integer propertyId, Integer announcementId, AnnouncementDto announcementDto) {
+        User owner = userService.getUserFromToken(jwtToken);
+        Optional<Property> property = propertyRepository.findById(propertyId);
+        if (property.isPresent() && owner.getProperties().contains(property.get())) {
+            return announcementRepository.findById(announcementId)
+                    .map(existingAnnouncement -> {
+                        if (announcementDto.getTitle() != null) {
+                            existingAnnouncement.setTitle(announcementDto.getTitle());
+                        }
+                        if (announcementDto.getDescription() != null) {
+                            existingAnnouncement.setDescription(announcementDto.getDescription());
+                        }
+                        if (announcementDto.getIssueDate() != null) {
+                            existingAnnouncement.setIssueDate(announcementDto.getIssueDate());
+                        }
+                        announcementRepository.save(existingAnnouncement);
+                        return true;
+                    })
+                    .orElse(false);
+        } else {
+            throw new NoSuchElementException("Error!");
+        }
     }
 
-    public boolean delete(Integer id) {
-        return announcementRepository.findById(id)
-                .map(announcement -> {
-                    announcementRepository.delete(announcement);
-                    return true;
-                }).orElse(false);
+    public boolean deleteAnnouncement(String jwtToken, Integer propertyId, Integer announcementId) {
+        User owner = userService.getUserFromToken(jwtToken);
+        Optional<Property> property = propertyRepository.findById(propertyId);
+        if (property.isPresent() && owner.getProperties().contains(property.get())) {
+            return announcementRepository.findById(announcementId)
+                    .map(announcement -> {
+                        announcementRepository.delete(announcement);
+                        return true;
+                    })
+                    .orElse(false);
+        } else {
+            throw new NoSuchElementException("Error!");
+        }
     }
 
     public List<AnnouncementDto> getAllAnnouncements(String jwtToken, Integer propertyId)

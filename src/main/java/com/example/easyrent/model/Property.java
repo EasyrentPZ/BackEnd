@@ -61,7 +61,12 @@ public class Property
     @OneToOne(mappedBy = "property")
     private Contract contract;
 
-    @ManyToMany(mappedBy = "properties")
+    @ManyToMany
+    @JoinTable(
+            name = "property_features",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id")
+    )
     private Set<Feature> features = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "property", cascade = {CascadeType.PERSIST, CascadeType.MERGE})

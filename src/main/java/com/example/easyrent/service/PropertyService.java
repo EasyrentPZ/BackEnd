@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,13 +52,16 @@ public class PropertyService
         return new PageImpl<>(dto);
     }
 
-    public PropertyResponseDto getOwnerProperty(String jwtToken, Integer propertyId)
-    {
+    public PropertyResponseDto getOwnerProperty(String jwtToken, Integer propertyId){
         User currentUser = userService.getUserFromToken(jwtToken);
-        Property property = propertyRepository.findById(propertyId).orElse(null);
-        if(property != null && currentUser.getProperties().contains(property))
-            return PropertyMapper.marketMapPropertyToDto(property);
-        return null;
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
+
+        if (!currentUser.getProperties().contains(property)) {
+            throw new RuntimeException("You do not have permission to access this property.");
+        }
+
+        return PropertyMapper.marketMapPropertyToDto(property);
     }
 
     public boolean deletePropertyById(String jwtToken, Integer id)
@@ -106,6 +110,36 @@ public class PropertyService
         addPropertyFeatures(property, request.getFeatures());
         addPropertyPhotos(owner, property, request.getImages());
         propertyRepository.save(property);
+    }
+
+    public boolean updatePropertyStatus(String jwtToken, Integer propertyId, Integer statusId) {
+        User currentUser = userService.getUserFromToken(jwtToken);
+        Optional<Property> propertyOptional = propertyRepository.findById(propertyId);
+
+        if (propertyOptional.isPresent()) {
+            Property property = propertyOptional.get();
+            if (currentUser.getProperties().contains(property)) {
+                Optional<PropertyStatus> statusOptional = statusRepository.findById(statusId);
+                if (statusOptional.isPresent()) {
+                    property.setPropertyStatus(statusOptional.get());
+                    propertyRepository.save(property);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Set<Feature> getPropertyFeatures(String jwtToken, Integer propertyId) {
+        User currentUser = userService.getUserFromToken(jwtToken);
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
+
+        if (!currentUser.getProperties().contains(property)) {
+            throw new RuntimeException("You do not have permission to access this property.");
+        }
+
+        return property.getFeatures();
     }
 
     private void addPropertyFeatures(Property property, Set<String> features)

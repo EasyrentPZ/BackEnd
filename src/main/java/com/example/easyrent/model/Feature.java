@@ -1,5 +1,6 @@
 package com.example.easyrent.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,10 +21,8 @@ public class Feature {
     @Column(name = "name", length = Integer.MAX_VALUE)
     private String name;
 
-    @ManyToMany
-    @JoinTable(name = "property_features",
-            joinColumns = @JoinColumn(name = "feature_id"),
-            inverseJoinColumns = @JoinColumn(name = "property_id"))
+    @ManyToMany(mappedBy = "features")
+    @JsonIgnore
     private Set<Property> properties = new LinkedHashSet<>();
 
 }
