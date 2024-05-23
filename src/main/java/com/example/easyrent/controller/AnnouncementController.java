@@ -42,19 +42,19 @@ public class AnnouncementController {
         return ResponseEntity.ok(announcementMapper.toDto(created));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<AnnouncementDto> updateAnnouncement(@PathVariable Integer id, @RequestBody AnnouncementDto announcementDto) {
-        Announcement updated = announcementService.update(id, announcementMapper.toEntity(announcementDto))
-                .orElse(null);
-        return updated != null ? ResponseEntity.ok(announcementMapper.toDto(updated)) : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAnnouncement(@PathVariable Integer id) {
-        if (announcementService.delete(id)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<AnnouncementDto> updateAnnouncement(@PathVariable Integer id, @RequestBody AnnouncementDto announcementDto) {
+//        Announcement updated = announcementService.update(id, announcementMapper.toEntity(announcementDto))
+//                .orElse(null);
+//        return updated != null ? ResponseEntity.ok(announcementMapper.toDto(updated)) : ResponseEntity.notFound().build();
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteAnnouncement(@PathVariable Integer id) {
+//        if (announcementService.delete(id)) {
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 }
