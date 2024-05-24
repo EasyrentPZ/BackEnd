@@ -4,6 +4,7 @@ package com.example.easyrent.dto.response;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -23,4 +24,8 @@ public class PropertyResponseDto
     private String streetName;
     private Set<PhotoInfoDto> photos;
     private Integer livingRooms;
+    private Integer contract_id;
+
+    //Additonal
+    private List<Integer> tenantsId;
 }

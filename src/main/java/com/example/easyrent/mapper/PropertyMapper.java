@@ -6,6 +6,8 @@ import com.example.easyrent.dto.response.PropertyResponseDto;
 import com.example.easyrent.model.Property;
 import org.springframework.beans.BeanUtils;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PropertyMapper
@@ -24,10 +26,19 @@ public class PropertyMapper
         propertyDto.setPhotos(property.getPropertyPhotos().stream()
                 .map(PropertyMapper::mapPhotoToDto)
                 .collect(Collectors.toSet()));
-
+        propertyDto.setContract_id(property.getContract().getId());
         return propertyDto;
     }
 
+    public static PropertyResponseDto ownerMapper(Property property)
+    {
+        PropertyResponseDto response = marketMapPropertyToDto(property);
+        List<Integer> tenants = new LinkedList<>();
+        for(User user: property.getContract().getUsers())
+            tenants.add(user.getId());
+        response.setTenantsId(tenants);
+        return response;
+    }
     private static OwnerInfoDto mapOwnerToDto(User owner)
     {
         OwnerInfoDto ownerDto = new OwnerInfoDto();

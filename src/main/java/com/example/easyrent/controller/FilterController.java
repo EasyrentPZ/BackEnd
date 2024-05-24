@@ -17,7 +17,7 @@ public class FilterController
 {
     private final FilterService filterService;
     @GetMapping("/properties")
-    public ResponseEntity<List<CityFilterResponseDto>> getAllPropertiesFilter(@CookieValue("jwtCookie") String jwtToken)
+    public ResponseEntity<List<CityFilterResponseDto>> getAllPropertiesFilter()
     {
         try
         {
@@ -31,7 +31,7 @@ public class FilterController
     }
 
     @GetMapping("/country/{countryName}")
-    public ResponseEntity<List<CityFilterResponseDto>> getAllCitiesForCountry(@CookieValue("jwtCookie") String jwtToken, @PathVariable("countryName") String countryName)
+    public ResponseEntity<List<CityFilterResponseDto>> getAllCitiesForCountry(@PathVariable("countryName") String countryName)
     {
         try
         {

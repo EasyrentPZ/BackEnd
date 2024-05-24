@@ -1,16 +1,10 @@
 package com.example.easyrent.controller;
 
-import com.example.easyrent.dto.request.PropertyAddRequestDto;
-import com.example.easyrent.dto.request.SignUpRequest;
-import com.example.easyrent.dto.request.TicketAddRequestDto;
-import com.example.easyrent.dto.request.UpdatePropertyStatusRequestDto;
-import com.example.easyrent.dto.response.AnnouncementDto;
-import com.example.easyrent.dto.response.MessageDto;
-import com.example.easyrent.dto.response.TicketViewResponseDto;
+import com.example.easyrent.dto.request.*;
+import com.example.easyrent.dto.response.*;
 import com.example.easyrent.model.Feature;
 import com.example.easyrent.service.AnnouncementService;
 import com.example.easyrent.service.PropertyService;
-import com.example.easyrent.dto.response.PropertyResponseDto;
 import com.example.easyrent.service.TicketService;
 import jakarta.el.PropertyNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,39 +22,30 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/property")
-public class PropertyController {
+public class PropertyController
+{
     private final PropertyService propertyService;
     private final AnnouncementService announcementService;
     private final TicketService ticketService;
 
-    @GetMapping
-    public ResponseEntity<Page<PropertyResponseDto>> getAllMarketProperties(@CookieValue("jwtCookie") String jwtToken) {
-        Page<PropertyResponseDto> propertiesPage = propertyService.getAllMarketProperties();
-        return ResponseEntity.ok().body(propertiesPage);
-    }
-
     @GetMapping("/owner")
-    public ResponseEntity<Page<PropertyResponseDto>> getOwnerProperties(@CookieValue("jwtCookie") String jwtToken) {
+    public ResponseEntity<Page<PropertyResponseDto>> getOwnerProperties(@CookieValue("jwtCookie") String jwtToken)
+    {
         Page<PropertyResponseDto> propertiesPage = propertyService.getOwnerProperties(jwtToken);
         return ResponseEntity.ok().body(propertiesPage);
     }
 
-    @GetMapping("/properties/{propertyId}")
-    public ResponseEntity<PropertyResponseDto> getProperty(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId) {
-        PropertyResponseDto propertyDto = propertyService.getOwnerProperty(jwtToken, propertyId);
-        if (propertyDto != null)
-            return ResponseEntity.ok().body(propertyDto);
-        else
-            return ResponseEntity.notFound().build();
-    }
-
     @GetMapping("/owner/properties/{propertyId}")
     @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<?> getOwnerProperty(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId) {
-        try {
+    public ResponseEntity<?> getOwnerProperty(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
+    {
+        try
+        {
             PropertyResponseDto propertyDto = propertyService.getOwnerProperty(jwtToken, propertyId);
             return ResponseEntity.ok(propertyDto);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageDto("UnknownError"));
         }
     }
@@ -77,7 +62,8 @@ public class PropertyController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id) {
+    public ResponseEntity<String> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id)
+    {
         boolean deleted = propertyService.deletePropertyById(jwtToken, id);
         if (deleted)
             return ResponseEntity.ok().body("Property " + "deleted successfully.");
@@ -88,7 +74,8 @@ public class PropertyController {
     @PostMapping(headers = {"Content-Type=multipart/form-data"}, value = "/add")
     @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<MessageDto> addProperty(@CookieValue("jwtCookie") String jwtToken,
-                                                  @ModelAttribute PropertyAddRequestDto propertyAddRequestDto) {
+                                                  @ModelAttribute PropertyAddRequestDto propertyAddRequestDto)
+    {
         try {
             propertyService.addProperty(jwtToken, propertyAddRequestDto);
             return ResponseEntity.ok(new MessageDto("Success"));
@@ -178,6 +165,19 @@ public class PropertyController {
         }
     }
 
+    @GetMapping("/status")
+    public ResponseEntity<PropertyStatusesDto> getAvailableStatuses()
+    {
+        try
+        {
+            PropertyStatusesDto response = propertyService.getStatuses();
+            return ResponseEntity.ok(response);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PutMapping("/status/{propertyId}")
     public ResponseEntity<MessageDto> updatePropertyStatus(@CookieValue("jwtCookie") String jwtToken,
@@ -193,6 +193,21 @@ public class PropertyController {
             return ResponseEntity.ok(new MessageDto("Property status updated successfully."));
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageDto("Could not update property status."));
+        }
+    }
+
+    @PostMapping("tenant/add")
+    public ResponseEntity<MessageDto> addTenantToProperty(@CookieValue("jwtCookie") String jwtToken,
+                                                          @RequestBody AddTenantDto request)
+    {
+        try
+        {
+            propertyService.addTenant(jwtToken, request);
+            return ResponseEntity.ok(new MessageDto("Success"));
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

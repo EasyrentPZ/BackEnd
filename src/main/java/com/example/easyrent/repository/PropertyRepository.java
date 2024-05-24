@@ -11,4 +11,5 @@ public interface PropertyRepository extends JpaRepository<Property, Integer>
 {
     List<Property> findByOwnerId(Integer ownerId);
     List<Property> findByPropertyStatusId(Integer propertyStatusId);
+    Property findPropertyById(Integer propertyId);
 }
