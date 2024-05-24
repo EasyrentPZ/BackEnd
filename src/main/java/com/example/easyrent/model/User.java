@@ -1,5 +1,6 @@
 package com.example.easyrent.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -89,6 +90,24 @@ public class User implements UserDetails
         for (Role role : roles)
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         return authorities;
+    }
+
+    public void addRole(Role role)
+    {
+        Set<Role> roles = this.getRoles();
+        roles.add(role);
+    }
+
+    public void addContract(Contract contract)
+    {
+        Set<Contract> contracts = this.getContracts();
+        contracts.add(contract);
+    }
+
+    public void addProperty(Property property)
+    {
+        Set<Property> properties = this.getProperties();
+        properties.add(property);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.easyrent.service;
 
 import com.example.easyrent.dto.request.TicketAddRequestDto;
+import com.example.easyrent.dto.response.MultivalueStringResponseDto;
 import com.example.easyrent.dto.response.TicketViewResponseDto;
 import com.example.easyrent.mapper.TicketMapper;
 import com.example.easyrent.model.*;
@@ -10,10 +11,7 @@ import com.example.easyrent.repository.TicketStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +29,6 @@ public class TicketService
         Optional<Property> property = propertyRepository.findById(propertyId);
         if(property.isPresent() && (owner.getProperties().contains(property.get()) || property.get().getContract().getUsers().contains(owner)))
         {
-            Property property1 = property.get();
             List<Ticket> tickets = ticketRepository.findTicketsByContract_Property_Id(propertyId);
             return  tickets.stream()
                     .map(TicketMapper::ticketMapToDto)
@@ -62,5 +59,14 @@ public class TicketService
         }
         else
             throw new NoSuchElementException("Error!");
+    }
+
+    public MultivalueStringResponseDto getTicketStatuses()
+    {
+        List<TicketStatus> statuses = ticketStatusRepository.findAll();
+        List<String> tmp = new LinkedList<>();
+        for(TicketStatus status: statuses)
+            tmp.add(status.getName());
+        return new MultivalueStringResponseDto(tmp);
     }
 }

@@ -1,24 +1,22 @@
 package com.example.easyrent.service;
 
+import com.example.easyrent.dto.request.AddTenantDto;
 import com.example.easyrent.dto.request.PropertyAddRequestDto;
 import com.example.easyrent.mapper.PropertyMapper;
 import com.example.easyrent.model.*;
-import com.example.easyrent.repository.CityRepository;
-import com.example.easyrent.repository.FeatureRepository;
-import com.example.easyrent.repository.PropertyRepository;
+import com.example.easyrent.repository.*;
 import com.example.easyrent.dto.response.*;
-import com.example.easyrent.repository.StatusRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +26,17 @@ public class PropertyService
     @Value("${google.const.header}")
     private String imageHeader;
     private final PropertyRepository propertyRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
     private final UploadObjectFromMemory uploadObjectFromMemory;
     private final StatusRepository statusRepository;
     private final CityRepository cityRepository;
     private final FeatureRepository featureRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
+    private final UserContractRepository userContractRepository;
+    private final PropertyStatusRepository propertyStatusRepository;
+
     public Page<PropertyResponseDto> getAllMarketProperties()
     {
         List<Property> properties = propertyRepository.findByPropertyStatusId(2);
@@ -52,16 +56,24 @@ public class PropertyService
         return new PageImpl<>(dto);
     }
 
-    public PropertyResponseDto getOwnerProperty(String jwtToken, Integer propertyId){
+    public PropertyResponseDto getProperty( Integer propertyId)
+    {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
+        return PropertyMapper.marketMapPropertyToDto(property);
+    }
+
+    public PropertyResponseDto getOwnerProperty(String jwtToken, Integer propertyId)
+    {
         User currentUser = userService.getUserFromToken(jwtToken);
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
-
-        if (!currentUser.getProperties().contains(property)) {
+        if (!currentUser.getProperties().contains(property))
+        {
             throw new RuntimeException("You do not have permission to access this property.");
         }
 
-        return PropertyMapper.marketMapPropertyToDto(property);
+        return PropertyMapper.ownerMapper(property);
     }
 
     public boolean deletePropertyById(String jwtToken, Integer id)
@@ -100,6 +112,7 @@ public class PropertyService
         property.setStreetName(request.getStreetName());
         property.setRentAmount(request.getRentAmount());
         property.setUtilityCost(request.getUtilityCost());
+        property.setContract(createContract(property));
 
         //Add repository values
         property.setCity(city);
@@ -108,7 +121,8 @@ public class PropertyService
 
         //Add set values
         addPropertyFeatures(property, request.getFeatures());
-        addPropertyPhotos(owner, property, request.getImages());
+        if(!request.getImages().isEmpty())
+            addPropertyPhotos(owner, property, request.getImages());
         propertyRepository.save(property);
     }
 
@@ -142,6 +156,43 @@ public class PropertyService
         return property.getFeatures();
     }
 
+    public PropertyStatusesDto getStatuses()
+    {
+        PropertyStatusesDto response = new PropertyStatusesDto();
+        List<PropertyStatus> statuses = propertyStatusRepository.findAll();
+        List<PropertyStatusDto> res = new LinkedList<>();
+        for(PropertyStatus status: statuses)
+            res.add(new PropertyStatusDto(status.getId(), status.getName()));
+        response.setStatuses(res);
+        return response;
+    }
+
+
+    @Transactional
+    public void addTenant(String token, AddTenantDto request)
+    {
+        User owner = userService.getUserFromToken(token);
+        User tenant = new User();
+        Property property = propertyRepository.findPropertyById(request.getPropertyId());
+        Role role = roleRepository.findByName("TENANT");
+
+        tenant.addRole(role);
+        tenant.addProperty(property);
+        tenant.addContract(property.getContract());
+        tenant.setName(request.getName());
+        tenant.setLastname(request.getLastname());
+        tenant.setUsername(request.getEmail());
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        tenant.setPassword(encodedPassword);
+
+        UserContract userContract = new UserContract();
+        userContract.setUser(tenant);
+        userContract.setContract(property.getContract());
+        userRepository.save(tenant);
+        userContractRepository.save(userContract);
+    }
+
     private void addPropertyFeatures(Property property, Set<String> features)
     {
         Set<Feature> newFeatures = featureRepository.getFeaturesByNameIn(features);
@@ -173,6 +224,15 @@ public class PropertyService
             counter ++;
         }
         property.setPropertyPhotos(propertyPhotos);
+    }
+
+    private Contract createContract(Property property)
+    {
+        Contract contract = new Contract();
+        contract.setProperty(property);
+        contract.setStartDate(LocalDate.now());
+        contract.setEndDate(LocalDate.of(2040, 12,31));
+        return contract;
     }
 
 }

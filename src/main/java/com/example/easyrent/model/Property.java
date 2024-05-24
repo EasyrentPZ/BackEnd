@@ -58,7 +58,7 @@ public class Property
     @Column(name = "living_rooms")
     private Integer livingRooms;
 
-    @OneToOne(mappedBy = "property")
+    @OneToOne(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Contract contract;
 
     @ManyToMany

@@ -11,7 +11,7 @@ import lombok.Setter;
 public class UserContract
 {
     @EmbeddedId
-    private UserContractId id;
+    private UserContractId id = new UserContractId();
 
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

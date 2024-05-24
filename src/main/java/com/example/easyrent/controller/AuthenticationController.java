@@ -3,9 +3,11 @@ package com.example.easyrent.controller;
 import com.example.easyrent.dto.request.SignInRequest;
 import com.example.easyrent.dto.request.SignUpRequest;
 import com.example.easyrent.dto.response.JwtAuthenticationResponse;
+import com.example.easyrent.dto.response.LoginResponseDto;
 import com.example.easyrent.dto.response.MessageDto;
 import com.example.easyrent.service.AuthenticationService;
 
+import com.example.easyrent.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController
 {
     private final AuthenticationService authenticationService;
+    private final UserService userService;
     @PostMapping("/signup")
     public ResponseEntity<MessageDto> signup(@RequestBody SignUpRequest request)
     {
@@ -51,14 +54,30 @@ public class AuthenticationController
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<MessageDto> signin(@RequestBody SignInRequest request, HttpServletResponse res)
+    public ResponseEntity<LoginResponseDto> signin(@RequestBody SignInRequest request, HttpServletResponse res)
     {
-        JwtAuthenticationResponse token = authenticationService.signIn(request);
-        Cookie jwtCookie = new Cookie("jwtCookie", token.getToken());
-        jwtCookie.setPath("/");
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setMaxAge(36000);
-        res.addCookie(jwtCookie);
-        return ResponseEntity.ok(new MessageDto("Success"));
+        try
+        {
+            JwtAuthenticationResponse response = authenticationService.signIn(request);
+            Cookie jwtCookie = new Cookie("jwtCookie", response.getToken());
+            jwtCookie.setPath("/");
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setMaxAge(3600);
+            res.addCookie(jwtCookie);
+            return ResponseEntity.ok(new LoginResponseDto("Success", userService.getUserFromToken(response.getToken()).getId()));
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(new LoginResponseDto("UnknownError!", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response)
+    {
+        Cookie authCookie = new Cookie("jwtCookie", null);
+        authCookie.setPath("/");
+        authCookie.setMaxAge(0);
+        response.addCookie(authCookie);
     }
 }
