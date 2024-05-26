@@ -8,6 +8,9 @@ import com.example.easyrent.repository.*;
 import com.example.easyrent.dto.response.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -193,6 +196,52 @@ public class PropertyService
         userContractRepository.save(userContract);
     }
 
+    @Transactional
+    public PropertyResponseDto updateProperty(String token, Integer propertyId, PropertyAddRequestDto request) throws Exception
+    {
+        User owner = userService.getUserFromToken(token);
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
+
+        if (!property.getOwner().equals(owner))
+            throw new RuntimeException("You do not have permission to update this property.");
+
+        copyNonNullProperties(request, property);
+
+        if (request.getCity() != null)
+        {
+            City city = cityRepository.findCityByCityName(request.getCity());
+            property.setCity(city);
+        }
+        if (request.getFeatures() != null && !request.getFeatures().isEmpty())
+            addPropertyFeatures(property, request.getFeatures());
+
+        if (request.getImages() != null && !request.getImages().isEmpty())
+            addPropertyPhotos(owner, property, request.getImages());
+
+        propertyRepository.save(property);
+        return PropertyMapper.marketMapPropertyToDto(property);
+    }
+
+    private void copyNonNullProperties(PropertyAddRequestDto src, Property target)
+    {
+        BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+    }
+
+    private String[] getNullPropertyNames(Object source)
+    {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
     private void addPropertyFeatures(Property property, Set<String> features)
     {
         Set<Feature> newFeatures = featureRepository.getFeaturesByNameIn(features);
@@ -202,7 +251,7 @@ public class PropertyService
     private void addPropertyPhotos(User user, Property property, List<MultipartFile> imageFiles)
     {
         Set<PropertyPhoto> propertyPhotos = new HashSet<>();
-        int counter = 0;
+        int counter = property.getPropertyPhotos().size();
         for (MultipartFile imageFile : imageFiles)
         {
             PropertyPhoto photo = new PropertyPhoto();
