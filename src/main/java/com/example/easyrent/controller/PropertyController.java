@@ -60,15 +60,29 @@ public class PropertyController
         }
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id)
+    public ResponseEntity<MessageDto> deletePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id)
     {
         boolean deleted = propertyService.deletePropertyById(jwtToken, id);
         if (deleted)
-            return ResponseEntity.ok().body("Property " + "deleted successfully.");
+            return ResponseEntity.ok().body(new MessageDto("Property " + "deleted successfully."));
         else
             return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping(headers = {"Content-Type=multipart/form-data"}, value = "/update/{id}")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<MessageDto> updatePropertyById(@CookieValue("jwtCookie") String jwtToken, @PathVariable("id") Integer id, @ModelAttribute PropertyAddRequestDto request)
+    {
+        try
+        {
+            propertyService.updateProperty(jwtToken, id, request);
+            return ResponseEntity.ok(new MessageDto("Success"));
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new MessageDto("UnknownError!"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(headers = {"Content-Type=multipart/form-data"}, value = "/add")
@@ -76,10 +90,13 @@ public class PropertyController
     public ResponseEntity<MessageDto> addProperty(@CookieValue("jwtCookie") String jwtToken,
                                                   @ModelAttribute PropertyAddRequestDto propertyAddRequestDto)
     {
-        try {
+        try
+        {
             propertyService.addProperty(jwtToken, propertyAddRequestDto);
             return ResponseEntity.ok(new MessageDto("Success"));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return new ResponseEntity<>(new MessageDto("UnknownError!"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
