@@ -19,6 +19,7 @@ public class PropertyMapper
 
         //Map rest of the more complicated objects
         propertyDto.setOwner(mapOwnerToDto(property.getOwner()));
+        propertyDto.setPropertyStatus(property.getPropertyStatus().getId());
         propertyDto.setFeatures(property.getFeatures().stream()
                 .map(PropertyMapper::mapFeaturesToDto)
                 .collect(Collectors.toSet()));

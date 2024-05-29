@@ -25,7 +25,7 @@ public class PropertyResponseDto
     private Set<PhotoInfoDto> photos;
     private Integer livingRooms;
     private Integer contract_id;
-
+    private Integer propertyStatus;
     //Additonal
     private List<Integer> tenantsId;
 }
