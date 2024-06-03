@@ -69,7 +69,11 @@ public class Property
     )
     private Set<Feature> features = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "property", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "property", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private Set<PropertyPhoto> propertyPhotos = new LinkedHashSet<>();
 
+    public void removePropertyPhoto(PropertyPhoto photo) throws Exception
+    {
+        this.propertyPhotos.remove(photo);
+    }
 }

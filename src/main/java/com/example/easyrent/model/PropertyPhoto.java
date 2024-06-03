@@ -14,7 +14,7 @@ public class PropertyPhoto {
     @Column(name = "photo_id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
