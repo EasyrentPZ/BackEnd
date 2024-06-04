@@ -3,6 +3,7 @@ package com.example.easyrent.service;
 import com.example.easyrent.dto.request.TicketAddRequestDto;
 import com.example.easyrent.dto.response.MessageDto;
 import com.example.easyrent.dto.response.MultivalueStringResponseDto;
+import com.example.easyrent.dto.response.PropertyResponseDto;
 import com.example.easyrent.dto.response.TicketViewResponseDto;
 import com.example.easyrent.mapper.TicketMapper;
 import com.example.easyrent.model.*;
@@ -33,6 +34,7 @@ public class TicketService
             List<Ticket> tickets = ticketRepository.findTicketsByContract_Property_Id(propertyId);
             return  tickets.stream()
                     .map(TicketMapper::ticketMapToDto)
+                    .sorted(Comparator.comparing(TicketViewResponseDto::getId))
                     .collect(Collectors.toList());
         }
         else
