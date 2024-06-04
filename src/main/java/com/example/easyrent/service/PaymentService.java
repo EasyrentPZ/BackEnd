@@ -10,6 +10,7 @@ import com.example.easyrent.repository.PaymentStatusRepository;
 import com.example.easyrent.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -73,8 +74,7 @@ public class PaymentService {
         {
             PaymentInfoDto x = new PaymentInfoDto();
             x.setPaymentStatus(payment.getPaymentStatus().getName());
-            x.setIssueDate(payment.getIssueDate());
-            x.setPaymentId(payment.getId());
+            BeanUtils.copyProperties(payment, x);
             responses.add(x);
         }
         response.setPayments(responses);
