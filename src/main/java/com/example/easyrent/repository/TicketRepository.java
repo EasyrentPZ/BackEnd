@@ -10,4 +10,5 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer>
 {
     List<Ticket> findTicketsByContract_Property_Id(Integer propertyId);
+    Ticket findTicketById(Integer ticketId);
 }

@@ -1,6 +1,7 @@
 package com.example.easyrent.service;
 
 import com.example.easyrent.dto.request.TicketAddRequestDto;
+import com.example.easyrent.dto.response.MessageDto;
 import com.example.easyrent.dto.response.MultivalueStringResponseDto;
 import com.example.easyrent.dto.response.TicketViewResponseDto;
 import com.example.easyrent.mapper.TicketMapper;
@@ -59,6 +60,14 @@ public class TicketService
         }
         else
             throw new NoSuchElementException("Error!");
+    }
+
+    public void changeTicketStatus(String token, Integer ticketId, MessageDto request) throws Exception
+    {
+        Ticket ticket = ticketRepository.findTicketById(ticketId);
+        TicketStatus status = ticketStatusRepository.findTicketStatusByName(request.getMessage());
+        ticket.setTicketStatus(status);
+        ticketRepository.save(ticket);
     }
 
     public MultivalueStringResponseDto getTicketStatuses()

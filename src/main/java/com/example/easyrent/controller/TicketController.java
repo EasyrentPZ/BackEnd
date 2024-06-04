@@ -9,6 +9,7 @@ import com.example.easyrent.service.AnnouncementService;
 import com.example.easyrent.service.PropertyService;
 import com.example.easyrent.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,22 @@ public class TicketController {
         catch (Exception e)
         {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{ticketId}")
+    public ResponseEntity<MessageDto> changeStatus(@CookieValue("jwtCookie") String jwtToken,
+                                                   @PathVariable("ticketId") Integer ticketId,
+                                                   @RequestBody MessageDto request)
+    {
+        try
+        {
+            ticketService.changeTicketStatus(jwtToken, ticketId, request);
+            return ResponseEntity.ok( new MessageDto("User registered successfully!"));
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(new MessageDto("UnknownError!"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
