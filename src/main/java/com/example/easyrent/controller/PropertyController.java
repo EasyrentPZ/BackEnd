@@ -50,6 +50,21 @@ public class PropertyController
         }
     }
 
+    @GetMapping("/tenant/property")
+    @PreAuthorize("hasAuthority('TENANT')")
+    public ResponseEntity<PropertyResponseDto> getOwnerProperty(@CookieValue("jwtCookie") String jwtToken)
+    {
+        try
+        {
+            PropertyResponseDto propertyDto = propertyService.getTenantProperty(jwtToken);
+            return ResponseEntity.ok(propertyDto);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/properties/features/{propertyId}")
     public ResponseEntity<?> getPropertyFeatures(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId) {
         try {

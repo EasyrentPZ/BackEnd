@@ -59,10 +59,18 @@ public class PropertyService
         return new PageImpl<>(dto);
     }
 
-    public PropertyResponseDto getProperty( Integer propertyId)
+    public PropertyResponseDto getProperty(Integer propertyId)
     {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found with id: " + propertyId));
+        return PropertyMapper.marketMapPropertyToDto(property);
+    }
+
+    public PropertyResponseDto getTenantProperty(String token) throws Exception
+    {
+        User currentUser = userService.getUserFromToken(token);
+        Contract contract = currentUser.getContracts().stream().findFirst().orElseThrow();
+        Property property = contract.getProperty();
         return PropertyMapper.marketMapPropertyToDto(property);
     }
 
