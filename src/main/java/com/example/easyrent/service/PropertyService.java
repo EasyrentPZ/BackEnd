@@ -45,6 +45,7 @@ public class PropertyService
         List<Property> properties = propertyRepository.findByPropertyStatusId(2);
         List<PropertyResponseDto> dto = properties.stream()
                 .map(PropertyMapper::marketMapPropertyToDto)
+                .sorted(Comparator.comparing(PropertyResponseDto::getId))
                 .collect(Collectors.toList());
         return new PageImpl<>(dto);
     }
@@ -55,6 +56,7 @@ public class PropertyService
         List<Property> properties = propertyRepository.findByOwnerId(currentUser.getId());
         List<PropertyResponseDto> dto = properties.stream()
                 .map(PropertyMapper::marketMapPropertyToDto)
+                .sorted(Comparator.comparing(PropertyResponseDto::getId))
                 .collect(Collectors.toList());
         return new PageImpl<>(dto);
     }
