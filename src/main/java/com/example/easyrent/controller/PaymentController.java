@@ -2,12 +2,15 @@ package com.example.easyrent.controller;
 
 import com.example.easyrent.dto.request.PaymentAddDto;
 import com.example.easyrent.dto.response.MessageDto;
+import com.example.easyrent.dto.response.PaymentInfoDto;
 import com.example.easyrent.dto.response.PaymentsInfoDto;
 import com.example.easyrent.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/payment")
@@ -45,12 +48,12 @@ public class PaymentController
     }
 
     @GetMapping("/payments/{propertyId}")
-    public ResponseEntity<PaymentsInfoDto> getAllPayments(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
+    public ResponseEntity<List<PaymentInfoDto>> getAllPayments(@CookieValue("jwtCookie") String jwtToken, @PathVariable("propertyId") Integer propertyId)
     {
         try
         {
             PaymentsInfoDto response = paymentService.getPayments(jwtToken, propertyId);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response.getPayments());
         }
         catch (Exception e)
         {
